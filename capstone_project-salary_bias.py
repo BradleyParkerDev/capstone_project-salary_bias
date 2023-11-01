@@ -1,6 +1,20 @@
+import pandas as pd
+import numpy as np
+import matplotlib as plt
+
+employee_file = pd.read_csv('emp_file_CAPSTONE.txt')
+print(employee_file)
+
+department_file = pd.read_csv('dept_CAPSTONE.txt')
+print(department_file)
+
+raises_file = pd.read_csv('raises_CAPSTONE.txt')
+print(raises_file)
+
 # You are a consulting firm tasked to examine the hiring practice of a division of a public company.
-# You are given the HR records of all past and present employees.  A complaint has been filed that this division
-# discriminates against women and low wage workers.  Examine the data and come up with a conclusion.
+# You are given the HR records of all past and present employees. 
+# A complaint has been filed that this division discriminates against women and low wage workers.  
+# Examine the data and come up with a conclusion.
 # The output should be in a jupyter notebook with the following name:
 # Lastname_firstname_DATASCIENCE_CAPSTONE_202106
 # Each answer should have a clear label of what you are answering using markdown
@@ -8,14 +22,24 @@
 
 
 
-
 # Part 1-a
 # 1 - Import employee file only the gender,salarly grade and dept columns
+
 # 2 - Fix the column dept capitalize it
+
 # 3 - Create a dataframe for every salary grade (index) with columns 'Male' and 'Female'
+
 # 4 - Create pie charts for every Salary Grade with the ratio of men to women
+
 # 5 - Create a dataframe for every Dept (index) with columns 'Male' and 'Female'
+
 # 6 - Create pie charts for every Dept with the ratio of men to women
+
+
+
+
+
+
 # NOTE - All charts should be automated
 
 
@@ -28,7 +52,7 @@
 # 6 - Create a horizontal bar chart with the number of employees per dept
 
 # Part 2 - a
-# 1 - Remove the NaN from the mi
+# 1 - Remove the NaN from the middle initial column
 # 2 - Import the dept_CAPSTONE.txt file
 # 3 - Make the deptCode all caps
 # 4 - Remove the non alpha characters in the dept name
@@ -82,7 +106,7 @@
 
 # Part 3a - Create employee Id
 # To construct the employee id for everyone use the following formula
-# First 3 letters of the last name + first 3 letters of the last name + a random 3 digit number from (1 - 999)
+# First 3 letters of the first name + first 3 letters of the last name + a random 3 digit number from (1 - 999) (edited) 
 # For example the employee name is Kevin Smith id = 'SMIKEV007'
 # In the case of people with the same last name and first name generate a new number
 # No duplication
