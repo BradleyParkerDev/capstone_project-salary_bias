@@ -3,13 +3,13 @@ import numpy as np
 import matplotlib as plt
 
 employee_file = pd.read_csv('emp_file_CAPSTONE.txt')
-print(employee_file)
+# print(employee_file)
 
 department_file = pd.read_csv('dept_CAPSTONE.txt')
-print(department_file)
+# print(department_file)
 
 raises_file = pd.read_csv('raises_CAPSTONE.txt')
-print(raises_file)
+# print(raises_file)
 
 # You are a consulting firm tasked to examine the hiring practice of a division of a public company.
 # You are given the HR records of all past and present employees. 
@@ -24,10 +24,28 @@ print(raises_file)
 
 # Part 1-a
 # 1 - Import employee file only the gender,salarly grade and dept columns
+part_one_df = pd.DataFrame(data = employee_file, columns=['gender', 'sg', 'dept'])
 
 # 2 - Fix the column dept capitalize it
+part_one_df = part_one_df.rename(columns={'dept':'DEPT'})
+print(part_one_df)
 
 # 3 - Create a dataframe for every salary grade (index) with columns 'Male' and 'Female'
+salary_grade_by_gender = part_one_df.groupby('sg')['gender'].value_counts().unstack().fillna(0)
+
+print(salary_grade_by_gender)
+
+dfs_by_sg = {}
+for sg, sg_data in salary_grade_by_gender.iterrows():
+    male_count = sg_data.get('M', 0)
+    female_count = sg_data.get('F', 0)
+    sg_df = pd.DataFrame({'Male': [male_count], 'Female': [female_count]})
+    dfs_by_sg[sg] = sg_df
+
+for sg, sg_df in dfs_by_sg.items():
+    print(f"Salary Grade {sg}:")
+    print(sg_df)
+
 
 # 4 - Create pie charts for every Salary Grade with the ratio of men to women
 
@@ -36,7 +54,7 @@ print(raises_file)
 # 6 - Create pie charts for every Dept with the ratio of men to women
 
 
-
+ 
 
 
 
