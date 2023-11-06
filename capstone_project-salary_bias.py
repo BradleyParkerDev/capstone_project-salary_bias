@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import matplotlib as plt
+import matplotlib.pyplot as plt
 
 employee_file = pd.read_csv('emp_file_CAPSTONE.txt')
 # print(employee_file)
@@ -48,6 +48,24 @@ for sg, sg_df in dfs_by_sg.items():
 
 
 # 4 - Create pie charts for every Salary Grade with the ratio of men to women
+for sg, sg_df in dfs_by_sg.items():
+    # Extract male and female counts
+    male_count = sg_df['Male'].values[0]
+    female_count = sg_df['Female'].values[0]
+    
+    # Create data for the pie chart
+    data = [male_count, female_count]
+    
+    # Labels for the pie chart
+    labels = ['Male', 'Female']
+    
+    # Create a pie chart
+    plt.figure()
+    plt.pie(data, labels=labels, autopct='%1.1f%%', startangle=90)
+    plt.title(f'Salary Grade {sg} - Men to Women Ratio')
+    
+    # Show the pie chart
+    plt.show()
 
 # 5 - Create a dataframe for every Dept (index) with columns 'Male' and 'Female'
 
