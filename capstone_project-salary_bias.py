@@ -53,25 +53,60 @@ for sg, sg_df in dfs_by_sg.items():
     male_count = sg_df['Male'].values[0]
     female_count = sg_df['Female'].values[0]
     
-    # Create data for the pie chart
+    # Creates data for the pie chart
     data = [male_count, female_count]
     
     # Labels for the pie chart
     labels = ['Male', 'Female']
     
-    # Create a pie chart
+    # Creates pie charts
     plt.figure()
     plt.pie(data, labels=labels, autopct='%1.1f%%', startangle=90)
     plt.title(f'Salary Grade {sg} - Men to Women Ratio')
     
-    # Show the pie chart
+    # Shows the pie charts
     plt.show()
 
 # 5 - Create a dataframe for every Dept (index) with columns 'Male' and 'Female'
 
+# Groups the part_one_df DataFrame by 'DEPT' (department) and 'gender', then get the counts
+department_by_gender = part_one_df.groupby('DEPT')['gender'].value_counts().unstack().fillna(0)
+
+# Creates a dictionary to store DataFrames for each department
+dfs_by_dept = {}
+
+# Loops through the departments and create DataFrames
+for dept, dept_data in department_by_gender.iterrows():
+    male_count = dept_data.get('M', 0)
+    female_count = dept_data.get('F', 0)
+    dept_df = pd.DataFrame({'Male': [male_count], 'Female': [female_count]})
+    dfs_by_dept[dept] = dept_df
+
+for dept, dept_df in dfs_by_dept.items():
+    print(f"Department: {dept}")
+    print(dept_df)
+    print("\n")
 # 6 - Create pie charts for every Dept with the ratio of men to women
 
-
+# Loops through the DataFrames in dfs_by_dept and create pie charts
+for dept, dept_df in dfs_by_dept.items():
+    # Extract male and female counts
+    male_count = dept_df['Male'].values[0]
+    female_count = dept_df['Female'].values[0]
+    
+    # Creates data for the pie charts
+    data = [male_count, female_count]
+    
+    # Labels for the pie chart
+    labels = ['Male', 'Female']
+    
+    # Creates pie charts
+    plt.figure()
+    plt.pie(data, labels=labels, autopct='%1.1f%%', startangle=90)
+    plt.title(f'Department: {dept} - Men to Women Ratio')
+    
+    # Shows the pie charts
+    plt.show() 
  
 
 
