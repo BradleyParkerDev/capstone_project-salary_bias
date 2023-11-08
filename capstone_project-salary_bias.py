@@ -22,91 +22,91 @@ raises_file = pd.read_csv('raises_CAPSTONE.txt')
 
 
 
-# Part 1-a
-# 1 - Import employee file only the gender,salarly grade and dept columns
-part_one_df = pd.DataFrame(data = employee_file, columns=['gender', 'sg', 'dept'])
+# # Part 1-a
+# # 1 - Import employee file only the gender,salarly grade and dept columns
+# part_one_df = pd.DataFrame(data = employee_file, columns=['gender', 'sg', 'dept'])
 
-# 2 - Fix the column dept capitalize it
-part_one_df = part_one_df.rename(columns={'dept':'DEPT'})
-print(part_one_df)
+# # 2 - Fix the column dept capitalize it
+# part_one_df = part_one_df.rename(columns={'dept':'DEPT'})
+# print(part_one_df)
 
-# 3 - Create a dataframe for every salary grade (index) with columns 'Male' and 'Female'
-salary_grade_by_gender = part_one_df.groupby('sg')['gender'].value_counts().unstack().fillna(0)
+# # 3 - Create a dataframe for every salary grade (index) with columns 'Male' and 'Female'
+# salary_grade_by_gender = part_one_df.groupby('sg')['gender'].value_counts().unstack().fillna(0)
 
-print(salary_grade_by_gender)
+# print(salary_grade_by_gender)
 
-dfs_by_sg = {}
-for sg, sg_data in salary_grade_by_gender.iterrows():
-    male_count = sg_data.get('M', 0)
-    female_count = sg_data.get('F', 0)
-    sg_df = pd.DataFrame({'Male': [male_count], 'Female': [female_count]})
-    dfs_by_sg[sg] = sg_df
+# dfs_by_sg = {}
+# for sg, sg_data in salary_grade_by_gender.iterrows():
+#     male_count = sg_data.get('M', 0)
+#     female_count = sg_data.get('F', 0)
+#     sg_df = pd.DataFrame({'Male': [male_count], 'Female': [female_count]})
+#     dfs_by_sg[sg] = sg_df
 
-for sg, sg_df in dfs_by_sg.items():
-    print(f"Salary Grade {sg}:")
-    print(sg_df)
+# for sg, sg_df in dfs_by_sg.items():
+#     print(f"Salary Grade {sg}:")
+#     print(sg_df)
 
 
-# 4 - Create pie charts for every Salary Grade with the ratio of men to women
-for sg, sg_df in dfs_by_sg.items():
-    # Extract male and female counts
-    male_count = sg_df['Male'].values[0]
-    female_count = sg_df['Female'].values[0]
+# # 4 - Create pie charts for every Salary Grade with the ratio of men to women
+# for sg, sg_df in dfs_by_sg.items():
+#     # Extract male and female counts
+#     male_count = sg_df['Male'].values[0]
+#     female_count = sg_df['Female'].values[0]
     
-    # Creates data for the pie chart
-    data = [male_count, female_count]
+#     # Creates data for the pie chart
+#     data = [male_count, female_count]
     
-    # Labels for the pie chart
-    labels = ['Male', 'Female']
+#     # Labels for the pie chart
+#     labels = ['Male', 'Female']
     
-    # Creates pie charts
-    plt.figure()
-    plt.pie(data, labels=labels, autopct='%1.1f%%', startangle=90)
-    plt.title(f'Salary Grade {sg} - Men to Women Ratio')
+#     # Creates pie charts
+#     plt.figure()
+#     plt.pie(data, labels=labels, autopct='%1.1f%%', startangle=90)
+#     plt.title(f'Salary Grade {sg} - Men to Women Ratio')
     
-    # Shows the pie charts
-    plt.show()
+#     # Shows the pie charts
+#     plt.show()
 
-# 5 - Create a dataframe for every Dept (index) with columns 'Male' and 'Female'
+# # 5 - Create a dataframe for every Dept (index) with columns 'Male' and 'Female'
 
-# Groups the part_one_df DataFrame by 'DEPT' (department) and 'gender', then get the counts
-department_by_gender = part_one_df.groupby('DEPT')['gender'].value_counts().unstack().fillna(0)
+# # Groups the part_one_df DataFrame by 'DEPT' (department) and 'gender', then get the counts
+# department_by_gender = part_one_df.groupby('DEPT')['gender'].value_counts().unstack().fillna(0)
 
-# Creates a dictionary to store DataFrames for each department
-dfs_by_dept = {}
+# # Creates a dictionary to store DataFrames for each department
+# dfs_by_dept = {}
 
-# Loops through the departments and create DataFrames
-for dept, dept_data in department_by_gender.iterrows():
-    male_count = dept_data.get('M', 0)
-    female_count = dept_data.get('F', 0)
-    dept_df = pd.DataFrame({'Male': [male_count], 'Female': [female_count]})
-    dfs_by_dept[dept] = dept_df
+# # Loops through the departments and create DataFrames
+# for dept, dept_data in department_by_gender.iterrows():
+#     male_count = dept_data.get('M', 0)
+#     female_count = dept_data.get('F', 0)
+#     dept_df = pd.DataFrame({'Male': [male_count], 'Female': [female_count]})
+#     dfs_by_dept[dept] = dept_df
 
-for dept, dept_df in dfs_by_dept.items():
-    print(f"Department: {dept}")
-    print(dept_df)
-    print("\n")
-# 6 - Create pie charts for every Dept with the ratio of men to women
+# for dept, dept_df in dfs_by_dept.items():
+#     print(f"Department: {dept}")
+#     print(dept_df)
+#     print("\n")
+# # 6 - Create pie charts for every Dept with the ratio of men to women
 
-# Loops through the DataFrames in dfs_by_dept and create pie charts
-for dept, dept_df in dfs_by_dept.items():
-    # Extract male and female counts
-    male_count = dept_df['Male'].values[0]
-    female_count = dept_df['Female'].values[0]
+# # Loops through the DataFrames in dfs_by_dept and create pie charts
+# for dept, dept_df in dfs_by_dept.items():
+#     # Extract male and female counts
+#     male_count = dept_df['Male'].values[0]
+#     female_count = dept_df['Female'].values[0]
     
-    # Creates data for the pie charts
-    data = [male_count, female_count]
+#     # Creates data for the pie charts
+#     data = [male_count, female_count]
     
-    # Labels for the pie chart
-    labels = ['Male', 'Female']
+#     # Labels for the pie chart
+#     labels = ['Male', 'Female']
     
-    # Creates pie charts
-    plt.figure()
-    plt.pie(data, labels=labels, autopct='%1.1f%%', startangle=90)
-    plt.title(f'Department: {dept} - Men to Women Ratio')
+#     # Creates pie charts
+#     plt.figure()
+#     plt.pie(data, labels=labels, autopct='%1.1f%%', startangle=90)
+#     plt.title(f'Department: {dept} - Men to Women Ratio')
     
-    # Shows the pie charts
-    plt.show() 
+#     # Shows the pie charts
+#     plt.show() 
  
 
 
@@ -116,21 +116,83 @@ for dept, dept_df in dfs_by_dept.items():
 
 # Part 1-b
 # 1 - Import employee file all columns
+print(employee_file)
+
+
+
+
 # 2 - Fix the case on the last name
+employee_file = employee_file.rename(columns={'ln':'LN'})
+print(employee_file)
+
+
+
 # 3 - Create a field call Name which has the lastname, First name MI
+employee_file['Name'] = employee_file['LN'] + ', ' + employee_file['fn'] + ' ' + employee_file['mi'].fillna('')
+print(employee_file)
+
+
+
+
 # 4 - Create a alphabetic list of employees by last name, first name (Name)
+sorted_employee_list = employee_file.sort_values(by=['LN', 'fn'])
+print(sorted_employee_list)
+
+
 # 5 - Create a alphabetic list of employees by last name, first name (Name) for each dept
+sorted_employee_lists_by_dept = {}
+
+for dept, group in employee_file.groupby('dept'):
+    sorted_group = group.sort_values(by=['LN', 'fn'])
+    sorted_group.reset_index(drop=True, inplace=True)  # Reset the index to start from 0
+    sorted_employee_lists_by_dept[dept] = sorted_group
+
+for dept, sorted_employee_list in sorted_employee_lists_by_dept.items():
+    print(f"Department: {dept}")
+    print(sorted_employee_list)
+    print("\n")
+
 # 6 - Create a horizontal bar chart with the number of employees per dept
+
+# Group the employees by department and count the number of employees in each department
+dept_employee_counts = employee_file['dept'].value_counts()
+
+# Create a horizontal bar chart
+plt.figure(figsize=(10, 6))  # Adjust the figure size as needed
+dept_employee_counts.plot(kind='barh', color='skyblue')
+plt.xlabel('Number of Employees')
+plt.ylabel('Department')
+plt.title('Number of Employees per Department')
+
+# Show the bar chart
+plt.show()
+
+
+
+
+
+
+
+
 
 # Part 2 - a
 # 1 - Remove the NaN from the middle initial column
+employee_file['mi'].fillna('', inplace=True)
+print(employee_file)
 # 2 - Import the dept_CAPSTONE.txt file
+print(department_file)
+
 # 3 - Make the deptCode all caps
+
 # 4 - Remove the non alpha characters in the dept name
+
 # 5 - Make the dept name each word initial caps
+
 # 6 - Combine the emp_file and the dept_file and join both tables on dept code
+
 # 7 - Create a file called ACTIVE_EMPLOYEES_BY_DEPT. Print list of all employees by dept by hire date (Descending order)
 # 	with terminated employees eliminated
+
 # 8 - Create a histogram that shows a count of the number of employees per dept by years employed
 
 
