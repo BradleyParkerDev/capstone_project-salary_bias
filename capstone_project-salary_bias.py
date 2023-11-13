@@ -114,58 +114,58 @@ raises_file = pd.read_csv('raises_CAPSTONE.txt')
 # NOTE - All charts should be automated
 
 
-# Part 1-b
-# 1 - Import employee file all columns
-print(employee_file)
+# # Part 1-b
+# # 1 - Import employee file all columns
+# print(employee_file)
 
 
 
 
-# 2 - Fix the case on the last name
-employee_file = employee_file.rename(columns={'ln':'LN'})
-print(employee_file)
+# # 2 - Fix the case on the last name
+employee_file['ln'] = employee_file['ln'].str.title()
+# print(employee_file)
 
 
 
-# 3 - Create a field call Name which has the lastname, First name MI
-employee_file['Name'] = employee_file['LN'] + ', ' + employee_file['fn'] + ' ' + employee_file['mi'].fillna('')
-print(employee_file)
+# # 3 - Create a field call Name which has the lastname, First name MI
+# employee_file['Name'] = employee_file['ln'] + ', ' + employee_file['fn'] + ' ' + employee_file['mi'].fillna('')
+# print(employee_file)
 
 
 
 
-# 4 - Create a alphabetic list of employees by last name, first name (Name)
-sorted_employee_list = employee_file.sort_values(by=['LN', 'fn'])
-print(sorted_employee_list)
+# # 4 - Create a alphabetic list of employees by last name, first name (Name)
+# sorted_employee_list = employee_file.sort_values(by=['ln', 'fn'])
+# print(sorted_employee_list)
 
 
-# 5 - Create a alphabetic list of employees by last name, first name (Name) for each dept
-sorted_employee_lists_by_dept = {}
+# # 5 - Create a alphabetic list of employees by last name, first name (Name) for each dept
+# sorted_employee_lists_by_dept = {}
 
-for dept, group in employee_file.groupby('dept'):
-    sorted_group = group.sort_values(by=['LN', 'fn'])
-    sorted_group.reset_index(drop=True, inplace=True)  # Reset the index to start from 0
-    sorted_employee_lists_by_dept[dept] = sorted_group
+# for dept, group in employee_file.groupby('dept'):
+#     sorted_group = group.sort_values(by=['ln', 'fn'])
+#     sorted_group.reset_index(drop=True, inplace=True)  # Reset the index to start from 0
+#     sorted_employee_lists_by_dept[dept] = sorted_group
 
-for dept, sorted_employee_list in sorted_employee_lists_by_dept.items():
-    print(f"Department: {dept}")
-    print(sorted_employee_list)
-    print("\n")
+# for dept, sorted_employee_list in sorted_employee_lists_by_dept.items():
+#     print(f"Department: {dept}")
+#     print(sorted_employee_list)
+#     print("\n")
 
-# 6 - Create a horizontal bar chart with the number of employees per dept
+# # 6 - Create a horizontal bar chart with the number of employees per dept
 
-# Group the employees by department and count the number of employees in each department
-dept_employee_counts = employee_file['dept'].value_counts()
+# # Group the employees by department and count the number of employees in each department
+# dept_employee_counts = employee_file['dept'].value_counts()
 
-# Create a horizontal bar chart
-plt.figure(figsize=(10, 6))  # Adjust the figure size as needed
-dept_employee_counts.plot(kind='barh', color='skyblue')
-plt.xlabel('Number of Employees')
-plt.ylabel('Department')
-plt.title('Number of Employees per Department')
+# # Create a horizontal bar chart
+# plt.figure(figsize=(10, 6))  # Adjust the figure size as needed
+# dept_employee_counts.plot(kind='barh', color='skyblue')
+# plt.xlabel('Number of Employees')
+# plt.ylabel('Department')
+# plt.title('Number of Employees per Department')
 
-# Show the bar chart
-plt.show()
+# # Show the bar chart
+# plt.show()
 
 
 
@@ -178,23 +178,82 @@ plt.show()
 # Part 2 - a
 # 1 - Remove the NaN from the middle initial column
 employee_file['mi'].fillna('', inplace=True)
-print(employee_file)
+# print(employee_file)
 # 2 - Import the dept_CAPSTONE.txt file
-print(department_file)
+# print(department_file)
 
 # 3 - Make the deptCode all caps
+department_file.columns = department_file.columns.str.replace("'", "")
+department_file['deptCode'] = department_file['deptCode'].str.upper()
+# print(department_file)
 
 # 4 - Remove the non alpha characters in the dept name
+department_file['dept name'] = department_file['dept name'].str.replace("[^a-zA-Z\s]", "", regex=True)
+# print(department_file)
 
 # 5 - Make the dept name each word initial caps
+department_file['dept name'] = department_file['dept name'].str.title()
+# print(department_file)
 
 # 6 - Combine the emp_file and the dept_file and join both tables on dept code
 
+# removes single quotes from deptCode values, and creates a dict from the department_file
+department_file['deptCode'] = department_file['deptCode'].str.replace("'", "")
+dept_dict = dict(zip(department_file['deptCode'], department_file['dept name']))
+# print(dept_dict)
+
+# combines the employee_file and department_file on the dept code
+employee_file['dept'] = employee_file['dept'].str.upper()
+combined_data = pd.merge(employee_file, department_file, left_on='dept', right_on='deptCode', how='left')
+combined_data = combined_data.drop('deptCode', axis=1)
+combined_data['dept name'] = combined_data['dept'].map(dept_dict)
+
+
+# print(combined_data)
+
+ 
+
 # 7 - Create a file called ACTIVE_EMPLOYEES_BY_DEPT. Print list of all employees by dept by hire date (Descending order)
 # 	with terminated employees eliminated
+# Filter out terminated employees
+
+# Creates an active_employees data frame
+combined_data.loc[combined_data['termdate'].apply(lambda x: len(str(x)) <= 1), 'termdate'] = ""
+active_employees = combined_data[combined_data['termdate'].apply(lambda x: len(str(x)) <= 1)]
+active_employees['hiredate'] = pd.to_datetime(active_employees['hiredate'], format='%m/%d/%Y')
+
+# Creates dictionary of  dataframes with active employees by department
+active_by_dept_data = {}
+for dept, group in active_employees.groupby('dept'):
+    sorted_group = group.sort_values(by='hiredate', ascending=False)
+    sorted_group.reset_index(drop=True, inplace=True)  # Reset the index to start from 0
+    active_by_dept_data[dept] = sorted_group
+
+# Creates one dataframe with employees by dept by hire date (Descending order)
+active_employees = pd.concat(active_by_dept_data.values(), ignore_index=True)
+print(active_employees)
+
+# Creates csv file
+active_employees.to_csv('ACTIVE_EMPLOYEES_BY_DEPT.csv', index=False)
+
 
 # 8 - Create a histogram that shows a count of the number of employees per dept by years employed
 
+# Step 1: Calculate years employed
+active_employees['hiredate'] = pd.to_datetime(active_employees['hiredate'])  # Ensure 'hiredate' is in datetime format
+active_employees['years_employed'] = (pd.to_datetime('today') - active_employees['hiredate']).dt.days // 365
+
+# Step 2: Create a histogram
+plt.figure(figsize=(10, 6))
+for dept, group in active_employees.groupby('dept'):
+    plt.hist(group['years_employed'], bins=20, alpha=0.7, label=dept)
+
+plt.title('Number of Employees per Department by Years Employed')
+plt.xlabel('Years Employed')
+plt.ylabel('Number of Employees')
+plt.legend()
+plt.grid(True)
+plt.show()
 
 # Part 2 - b - SALARY ANALYSIS
 # NOTE: A normal distribution has the following attributes:
