@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import statistics as stats
 import matplotlib.pyplot as plt
 
 employee_file = pd.read_csv('emp_file_CAPSTONE.txt')
@@ -231,7 +232,7 @@ for dept, group in active_employees.groupby('dept'):
 
 # Creates one dataframe with employees by dept by hire date (Descending order)
 active_employees = pd.concat(active_by_dept_data.values(), ignore_index=True)
-print(active_employees)
+# print(active_employees)
 
 # Creates csv file
 active_employees.to_csv('ACTIVE_EMPLOYEES_BY_DEPT.csv', index=False)
@@ -240,20 +241,20 @@ active_employees.to_csv('ACTIVE_EMPLOYEES_BY_DEPT.csv', index=False)
 # 8 - Create a histogram that shows a count of the number of employees per dept by years employed
 
 # Step 1: Calculate years employed
-active_employees['hiredate'] = pd.to_datetime(active_employees['hiredate'])  # Ensure 'hiredate' is in datetime format
-active_employees['years_employed'] = (pd.to_datetime('today') - active_employees['hiredate']).dt.days // 365
+# active_employees['hiredate'] = pd.to_datetime(active_employees['hiredate'])  # Ensure 'hiredate' is in datetime format
+# active_employees['years_employed'] = (pd.to_datetime('today') - active_employees['hiredate']).dt.days // 365
 
-# Step 2: Create a histogram
-plt.figure(figsize=(10, 6))
-for dept, group in active_employees.groupby('dept'):
-    plt.hist(group['years_employed'], bins=20, alpha=0.7, label=dept)
+# # Step 2: Create a histogram
+# plt.figure(figsize=(10, 6))
+# for dept, group in active_employees.groupby('dept'):
+#     plt.hist(group['years_employed'], bins=20, alpha=0.7, label=dept)
 
-plt.title('Number of Employees per Department by Years Employed')
-plt.xlabel('Years Employed')
-plt.ylabel('Number of Employees')
-plt.legend()
-plt.grid(True)
-plt.show()
+# plt.title('Number of Employees per Department by Years Employed')
+# plt.xlabel('Years Employed')
+# plt.ylabel('Number of Employees')
+# plt.legend()
+# plt.grid(True)
+# plt.show()
 
 # Part 2 - b - SALARY ANALYSIS
 # NOTE: A normal distribution has the following attributes:
@@ -271,14 +272,144 @@ plt.show()
 # 8 -->5
 # 9 -->6
 
-# 2 - Create a histogram of all salaries in deciles
-# 3 - Calculate the mean, mode, median, and standard deviation of the salaries
-# 4 - Is the salary distribution a normal distribution?
-# 5 - Calculate the mean, mode, median, and standard deviation of the salaries of men
-# 6 - Calculate the mean, mode, median, and standard deviation of the salaries of women
-# 7 - Is the standard deviation, mean, mode, median higher for men? Calulate the % difference
-# 8 - Write up- Do you think there is salary bias?
+decode_mapping = {
+    '0': 7,
+    '1': 8,
+    '2': 9,
+    '3': 0,
+    '4': 1,
+    '5': 2,
+    '6': 3,
+    '7': 4,
+    '8': 5,
+    '9': 6
+}
 
+def decode_salary(salary_str):
+    # Remove dollar sign and then find the position of 'X' in the string
+    salary_str = salary_str.replace('$', '')
+    x_position = salary_str.find('X')
+    
+    if x_position != -1:
+        decoded_str = ''.join(str(decode_mapping[digit]) for digit in salary_str[x_position + 1:])
+        return int(decoded_str)
+    else:
+        return int(salary_str)
+
+# Apply the decoding function to the 'salary' column
+active_employees['decoded_salary'] = active_employees['salary'].astype(str).apply(decode_salary)
+active_employees['salary'] = active_employees['decoded_salary']
+active_employees.drop('decoded_salary', axis=1, inplace=True)
+print(active_employees)
+
+# 2 - Create a histogram of all salaries in deciles
+
+
+# # Defines the number of bins
+# num_bins = 10
+
+# # Creates salary bins
+# salary_bins = np.linspace(active_employees['salary'].min(), active_employees['salary'].max(), num_bins + 1)
+
+# # Creates histogram
+# plt.figure(figsize=(10, 6))
+# plt.hist(active_employees['salary'], bins=salary_bins, color='blue', alpha=0.7, rwidth=0.85)
+# plt.title('Histogram of Salaries with 10 Bins')
+# plt.xlabel('Salary')
+# plt.ylabel('Frequency')
+# plt.grid(axis='y', linestyle='--', alpha=0.7)
+
+# # Labels x-axis with salary ranges
+# bin_labels = [f'${int(salary_bins[i])}-{int(salary_bins[i+1])}' for i in range(len(salary_bins)-1)]
+# plt.xticks(salary_bins[:-1], bin_labels, rotation=45, ha='right')  # Adjust here
+
+# plt.show()
+
+
+
+# 3 - Calculate the mean, mode, median, and standard deviation of the salaries
+
+# Calculate mean, mode, median, and standard deviation
+mean_salary = np.mean(active_employees['salary'])
+mode_salary = stats.mode(active_employees['salary'])
+median_salary = np.median(active_employees['salary'])
+std_dev_salary = np.std(active_employees['salary'])
+
+# Print the results
+print(f"Mean Salary: ${mean_salary:.2f}")
+print(f"Mode Salary: ${mode_salary:.2f}")
+print(f"Median Salary: ${median_salary:.2f}")
+print(f"Standard Deviation of Salary: ${std_dev_salary:.2f}")
+
+# 4 - Is the salary distribution a normal distribution?
+
+"""
+The salary distribution is skewed to the right, 
+and salaries begin to visibly decline after the 
+fifth bin in the histogram.  
+A marjority of people are paid within the salary range of
+$21,875 and $243,309; there are visibly fewer people being paid more than this.
+
+"""
+
+
+# 5 - Calculate the mean, mode, median, and standard deviation of the salaries of men
+print()
+# Filters the DataFrame for male employees
+male_salaries = active_employees[active_employees['gender'] == 'M']['salary']
+
+# Calculates mean, mode, median, and standard deviation
+mean_salary_male = stats.mean(male_salaries)
+mode_salary_male = stats.mode(male_salaries)
+median_salary_male = stats.median(male_salaries)
+std_dev_salary_male = stats.stdev(male_salaries)
+
+# Prints the results
+print(f"Mean Salary of Men: ${mean_salary_male}")
+print(f"Mode Salary of Men: ${mode_salary_male}")
+print(f"Median Salary of Men: ${median_salary_male}")
+print(f"Standard Deviation of Salary of Men: ${std_dev_salary_male}")
+
+# 6 - Calculate the mean, mode, median, and standard deviation of the salaries of women
+print()
+
+# Filters the DataFrame for female employees
+female_salaries = active_employees[active_employees['gender'] == 'F']['salary']
+
+# Calculates mean, mode, median, and standard deviation
+mean_salary_female = stats.mean(female_salaries)
+mode_salary_female = stats.mode(female_salaries)
+median_salary_female = stats.median(female_salaries)
+std_dev_salary_female = stats.stdev(female_salaries)
+
+# Prints the results
+print(f"Mean Salary of Women: ${mean_salary_female}")
+print(f"Mode Salary of Women: ${mode_salary_female}")
+print(f"Median Salary of Women: ${median_salary_female}")
+print(f"Standard Deviation of Salary of Women: ${std_dev_salary_female}")
+
+# 7 - Is the standard deviation, mean, mode, median higher for men? Calulate the % difference
+print()
+
+# Calculate the percentage differences
+mean_diff_percent = ((mean_salary_male - mean_salary_female) / mean_salary_female) * 100
+mode_diff_percent = ((mode_salary_male - mode_salary_female) / mode_salary_female) * 100
+median_diff_percent = ((median_salary_male - median_salary_female) / median_salary_female) * 100
+std_dev_diff_percent = ((std_dev_salary_male - std_dev_salary_female) / std_dev_salary_female) * 100
+
+# Print the results
+print("Mean Salary Difference (%):",mean_diff_percent)
+print("Mode Salary Difference (%):",mode_diff_percent)
+print("Median Salary Difference (%):",median_diff_percent)
+print("Standard Deviation Difference (%):",std_dev_diff_percent)
+
+
+# 8 - Write up- Do you think there is salary bias?
+"""
+
+
+
+"""
 
 # Part 2 - c
 # The salary grades of 5 - 7 are considered executive salary grades - Exempt or EXECUTIVE
