@@ -406,9 +406,12 @@ print("Standard Deviation Difference (%):",std_dev_diff_percent)
 
 # 8 - Write up- Do you think there is salary bias?
 """
-
-
-
+I think there might be a bias towards women. The mean and median salaries 
+of women are higher than those of males. Their standard
+deviation is also around 10% lower than the males--which means their 
+salaries dont deviate as much from their mean salary. However, it's crucial 
+to consider that males constitute a majority of the employees in the organization, 
+and the sample size should be taken into account when drawing conclusions.
 """
 
 # Part 2 - c
@@ -419,7 +422,7 @@ print("Standard Deviation Difference (%):",std_dev_diff_percent)
 # 3 - Calculate the mean, mode, median, and standard deviation of the salaries of EXEMPT employees
 # 4 - Calculate the mean, mode, median, and standard deviation of the salaries of NON-EXEMPT employees
 # 5 - Create pie charts of the employee status of EXEMPT count by gender and NON-EXEMPT count by gender
-# 6 - Create scatter plots of salary grade by mean salary
+# 6 - Create scatter plots of salasry grade by mean salary
 # 7 - Create a scatter plots of salary grade by mean salary for men
 # 8 - Create a scatter plots of salary grade by mean salary for women
 # 9 - Create a horizontal bar chart of EXEMPT employees by mean salary for men and women (1 chart)
