@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import seaborn as sns
+
 import statistics as stats
 import matplotlib.pyplot as plt
 
@@ -129,7 +131,7 @@ employee_file['ln'] = employee_file['ln'].str.title()
 
 
 # # 3 - Create a field call Name which has the lastname, First name MI
-# employee_file['Name'] = employee_file['ln'] + ', ' + employee_file['fn'] + ' ' + employee_file['mi'].fillna('')
+employee_file['Name'] = employee_file['ln'] + ', ' + employee_file['fn'] + ' ' + employee_file['mi'].fillna('')
 # print(employee_file)
 
 
@@ -335,11 +337,11 @@ mode_salary = stats.mode(active_employees['salary'])
 median_salary = np.median(active_employees['salary'])
 std_dev_salary = np.std(active_employees['salary'])
 
-# Print the results
-print(f"Mean Salary: ${mean_salary:.2f}")
-print(f"Mode Salary: ${mode_salary:.2f}")
-print(f"Median Salary: ${median_salary:.2f}")
-print(f"Standard Deviation of Salary: ${std_dev_salary:.2f}")
+# # Print the results
+# print(f"Mean Salary: ${mean_salary:.2f}")
+# print(f"Mode Salary: ${mode_salary:.2f}")
+# print(f"Median Salary: ${median_salary:.2f}")
+# print(f"Standard Deviation of Salary: ${std_dev_salary:.2f}")
 
 # 4 - Is the salary distribution a normal distribution?
 
@@ -365,13 +367,13 @@ median_salary_male = stats.median(male_salaries)
 std_dev_salary_male = stats.stdev(male_salaries)
 
 # Prints the results
-print(f"Mean Salary of Men: ${mean_salary_male}")
-print(f"Mode Salary of Men: ${mode_salary_male}")
-print(f"Median Salary of Men: ${median_salary_male}")
-print(f"Standard Deviation of Salary of Men: ${std_dev_salary_male}")
+# print(f"Mean Salary of Men: ${mean_salary_male}")
+# print(f"Mode Salary of Men: ${mode_salary_male}")
+# print(f"Median Salary of Men: ${median_salary_male}")
+# print(f"Standard Deviation of Salary of Men: ${std_dev_salary_male}")
 
-# 6 - Calculate the mean, mode, median, and standard deviation of the salaries of women
-print()
+# # 6 - Calculate the mean, mode, median, and standard deviation of the salaries of women
+# print()
 
 # Filters the DataFrame for female employees
 female_salaries = active_employees[active_employees['gender'] == 'F']['salary']
@@ -383,13 +385,13 @@ median_salary_female = stats.median(female_salaries)
 std_dev_salary_female = stats.stdev(female_salaries)
 
 # Prints the results
-print(f"Mean Salary of Women: ${mean_salary_female}")
-print(f"Mode Salary of Women: ${mode_salary_female}")
-print(f"Median Salary of Women: ${median_salary_female}")
-print(f"Standard Deviation of Salary of Women: ${std_dev_salary_female}")
+# print(f"Mean Salary of Women: ${mean_salary_female}")
+# print(f"Mode Salary of Women: ${mode_salary_female}")
+# print(f"Median Salary of Women: ${median_salary_female}")
+# print(f"Standard Deviation of Salary of Women: ${std_dev_salary_female}")
 
-# 7 - Is the standard deviation, mean, mode, median higher for men? Calulate the % difference
-print()
+# # 7 - Is the standard deviation, mean, mode, median higher for men? Calulate the % difference
+# print()
 
 # Calculate the percentage differences
 mean_diff_percent = ((mean_salary_male - mean_salary_female) / mean_salary_female) * 100
@@ -398,10 +400,10 @@ median_diff_percent = ((median_salary_male - median_salary_female) / median_sala
 std_dev_diff_percent = ((std_dev_salary_male - std_dev_salary_female) / std_dev_salary_female) * 100
 
 # Print the results
-print("Mean Salary Difference (%):",mean_diff_percent)
-print("Mode Salary Difference (%):",mode_diff_percent)
-print("Median Salary Difference (%):",median_diff_percent)
-print("Standard Deviation Difference (%):",std_dev_diff_percent)
+# print("Mean Salary Difference (%):",mean_diff_percent)
+# print("Mode Salary Difference (%):",mode_diff_percent)
+# print("Median Salary Difference (%):",median_diff_percent)
+# print("Standard Deviation Difference (%):",std_dev_diff_percent)
 
 
 # 8 - Write up- Do you think there is salary bias?
@@ -418,17 +420,140 @@ and the sample size should be taken into account when drawing conclusions.
 # The salary grades of 5 - 7 are considered executive salary grades - Exempt or EXECUTIVE
 # The salary grades of 1 - 4 are considered - Non-exempt (Hourly) - NON-EXECUTIVE
 # 1 - create a new column called 'Status' Label each employee record in alpha order by name as EXEMPT or NON-EXEMPT
+def createStatus(value):
+    if value >=5:
+        return 'EXEMPT'
+    else:
+        return 'NON-EXEMPT'   
+active_employees['Status'] = active_employees['sg'].apply(createStatus)
+print(active_employees)
 # 2 - Calculate the mean, mode, median, and standard deviation of the salaries of each salary grade
-# 3 - Calculate the mean, mode, median, and standard deviation of the salaries of EXEMPT employees
-# 4 - Calculate the mean, mode, median, and standard deviation of the salaries of NON-EXEMPT employees
+
+
+# # Groups by 'sg' (salary grade) and calculate the required statistics
+# salary_stats_by_grade = active_employees.groupby('sg')['salary'].agg(['mean', 'median', 'std', lambda x: x.mode().iloc[0]])
+
+# # Renames the columns for clarity
+# salary_stats_by_grade.columns = ['Mean Salary', 'Median Salary', 'Standard Deviation', 'Mode Salary']
+
+# # Displays the results
+# print(salary_stats_by_grade) 
+
+# # 3 - Calculate the mean, mode, median, and standard deviation of the salaries of EXEMPT employees
+# print()
+# print('EXEMPT Salary Stats: ')
+# exempt_salary_stats = active_employees[active_employees['Status'] == 'EXEMPT']['salary'].agg(['mean', 'median', 'std', lambda x: x.mode().iloc[0]])
+# exempt_salary_stats.index = ['Mean:', 'Median:', 'Standard Deviation:', 'Mode:']
+# print(exempt_salary_stats)
+
+# # 4 - Calculate the mean, mode, median, and standard deviation of the salaries of NON-EXEMPT employees
+# print()
+# print('NON-EXEMPT Salary Stats: ')
+# non_exempt_salary_stats = active_employees[active_employees['Status'] == 'NON-EXEMPT']['salary'].agg(['mean', 'median', 'std', lambda x: x.mode().iloc[0]])
+# non_exempt_salary_stats.index = ['Mean:', 'Median:', 'Standard Deviation:', 'Mode:']
+# print(non_exempt_salary_stats)
+
 # 5 - Create pie charts of the employee status of EXEMPT count by gender and NON-EXEMPT count by gender
+
+# # Groups by 'Status' and 'gender' and count the occurrences
+# status_gender_counts = active_employees.groupby(['Status', 'gender']).size().unstack()
+
+# print(status_gender_counts)
+# # Plotting the pie charts
+# fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(12, 6))
+
+# # Pie chart for EXEMPT count by gender
+# axes[0].pie(status_gender_counts.loc['EXEMPT'], labels=status_gender_counts.columns, autopct='%1.1f%%', startangle=90)
+# axes[0].set_title('EXEMPT Employee Count by Gender')
+
+# # Pie chart for NON-EXEMPT count by gender
+# axes[1].pie(status_gender_counts.loc['NON-EXEMPT'], labels=status_gender_counts.columns, autopct='%1.1f%%', startangle=90)
+# axes[1].set_title('NON-EXEMPT Employee Count by Gender')
+
+# plt.show()
 # 6 - Create scatter plots of salasry grade by mean salary
+# # Group by 'sg' and calculate the mean salary for each salary grade
+# salary_by_grade = active_employees.groupby('sg')['salary'].mean().reset_index()
+
+# # Scatter plot
+# plt.figure(figsize=(10, 6))
+# plt.scatter(salary_by_grade['sg'], salary_by_grade['salary'], color='blue', marker='o')
+# plt.title('Scatter Plot of Salary Grade by Mean Salary')
+# plt.xlabel('Salary Grade')
+# plt.ylabel('Mean Salary')
+# plt.grid(True)
+# plt.show()
+
 # 7 - Create a scatter plots of salary grade by mean salary for men
-# 8 - Create a scatter plots of salary grade by mean salary for women
+
+# Filters the DataFrame for male employees
+# male_employees = active_employees[active_employees['gender'] == 'M']
+
+# Groups by 'sg' and calculate the mean salary for each salary grade for men
+# salary_by_grade_male = male_employees.groupby('sg')['salary'].mean().reset_index()
+
+# # Scatter plot for men
+# plt.figure(figsize=(10, 6))
+# plt.scatter(salary_by_grade_male['sg'], salary_by_grade_male['salary'], color='green', marker='o')
+# plt.title('Scatter Plot of Salary Grade by Mean Salary for Men')
+# plt.xlabel('Salary Grade')
+# plt.ylabel('Mean Salary')
+# plt.grid(True)
+# plt.show()
+
+# # 8 - Create a scatter plots of salary grade by mean salary for women
+
+# # Filters the DataFrame for female employees
+# female_employees = active_employees[active_employees['gender'] == 'F']
+
+# # Groups by 'sg' and calculate the mean salary for each salary grade for women
+# salary_by_grade_female = female_employees.groupby('sg')['salary'].mean().reset_index()
+
+# # Scatter plot for women
+# plt.figure(figsize=(10, 6))
+# plt.scatter(salary_by_grade_female['sg'], salary_by_grade_female['salary'], color='purple', marker='o')
+# plt.title('Scatter Plot of Salary Grade by Mean Salary for Women')
+# plt.xlabel('Salary Grade')
+# plt.ylabel('Mean Salary')
+# plt.grid(True)
+# plt.show()
 # 9 - Create a horizontal bar chart of EXEMPT employees by mean salary for men and women (1 chart)
+
+# Filter the DataFrame for EXEMPT employees
+# exempt_employees = active_employees[active_employees['Status'] == 'EXEMPT']
+
+# # Group by 'gender' and calculate the mean salary for each gender
+# salary_by_gender_exempt = exempt_employees.groupby('gender')['salary'].mean().reset_index()
+
+# Bar chart for EXEMPT employees by mean salary for men and women
+# plt.figure(figsize=(10, 6))
+# sns.barplot(x='salary', y='gender', data=salary_by_gender_exempt, palette='viridis')
+# plt.title('Mean Salary of EXEMPT Employees by Gender')
+# plt.xlabel('Mean Salary')
+# plt.ylabel('Gender')
+# plt.show()
 # 10- Create a horizontal bar chart of NON-EXEMPT employees by mean salary for men and women (1 chart)
+# Filters the DataFrame for NON-EXEMPT employees
+# non_exempt_employees = active_employees[active_employees['Status'] == 'NON-EXEMPT']
+
+# # Groups by 'gender' and calculate the mean salary for each gender
+# salary_by_gender_non_exempt = non_exempt_employees.groupby('gender')['salary'].mean().reset_index()
+
+# # Bar chart for NON-EXEMPT employees by mean salary for men and women
+# plt.figure(figsize=(10, 6))
+# sns.barplot(x='salary', y='gender', data=salary_by_gender_non_exempt, palette='mako')
+# plt.title('Mean Salary of NON-EXEMPT Employees by Gender')
+# plt.xlabel('Mean Salary')
+# plt.ylabel('Gender')
+# plt.show()
 # 11 - Sort and output every Employee all columns by salary grade by name for every salary grade
 
+# Sorts the DataFrame by 'sg' and then by 'fn' for each salary grade
+sorted_employees_by_grade = active_employees.sort_values(by=['sg', 'ln'])
+# Groups by 'sg' and print each group
+for sg, group in sorted_employees_by_grade.groupby('sg'):
+    print(f"Salary Grade: {sg}\n")
+    print(group.reset_index(drop=True), end='\n\n')
 
 # Part 3a - Create employee Id
 # To construct the employee id for everyone use the following formula
