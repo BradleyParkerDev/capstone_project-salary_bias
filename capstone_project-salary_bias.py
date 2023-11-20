@@ -1,9 +1,10 @@
 import pandas as pd
 import numpy as np
 import seaborn as sns
-
+import random
 import statistics as stats
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 employee_file = pd.read_csv('emp_file_CAPSTONE.txt')
 # print(employee_file)
@@ -302,7 +303,7 @@ def decode_salary(salary_str):
 active_employees['decoded_salary'] = active_employees['salary'].astype(str).apply(decode_salary)
 active_employees['salary'] = active_employees['decoded_salary']
 active_employees.drop('decoded_salary', axis=1, inplace=True)
-print(active_employees)
+# print(active_employees)
 
 # 2 - Create a histogram of all salaries in deciles
 
@@ -548,12 +549,12 @@ print(active_employees)
 # plt.show()
 # 11 - Sort and output every Employee all columns by salary grade by name for every salary grade
 
-# Sorts the DataFrame by 'sg' and then by 'fn' for each salary grade
-sorted_employees_by_grade = active_employees.sort_values(by=['sg', 'ln'])
-# Groups by 'sg' and print each group
-for sg, group in sorted_employees_by_grade.groupby('sg'):
-    print(f"Salary Grade: {sg}\n")
-    print(group.reset_index(drop=True), end='\n\n')
+# Sorts the DataFrame by 'sg' and then by 'ln' for each salary grade
+# sorted_employees_by_grade = active_employees.sort_values(by=['sg', 'ln'])
+# # Groups by 'sg' and print each group
+# for sg, group in sorted_employees_by_grade.groupby('sg'):
+#     print(f"Salary Grade: {sg}\n")
+#     print(group.reset_index(drop=True), end='\n\n')
 
 # Part 3a - Create employee Id
 # To construct the employee id for everyone use the following formula
@@ -563,17 +564,149 @@ for sg, group in sorted_employees_by_grade.groupby('sg'):
 # No duplication
 # 1 - List all employees in employee id order
 
+# Function to generate a random 3-digit number
+def generate_random_number():
+    return str(random.randint(1, 999)).zfill(3)
+
+# Function to construct the employee ID
+def construct_employee_id(row):
+    first_name = row['fn'][:3].upper()
+    last_name = row['ln'][:3].upper()
+    random_number = generate_random_number()
+    employee_id = last_name + first_name + random_number
+    return employee_id
+
+# Apply the function to create a new 'Employee_ID' column
+active_employees['Employee_ID'] = active_employees.apply(construct_employee_id, axis=1)
+
+# Sort the DataFrame by the 'Employee_ID' column
+active_employees_sorted = active_employees.sort_values(by='Employee_ID')
+
+# Print the sorted DataFrame
+print(active_employees_sorted[['Employee_ID', 'fn', 'ln']])
+
 
 # Part 3b -Raises
 # 1 - Import the file raises_CAPSTONE.txt
+print(raises_file)
+
 # 2 - The rules for giving a raise are in the file but be careful of the order that your run the raise
+
 # 3 - Based on each employees salary calculate 2 fields 'Raise_Amount' and 'New_Salary'
+
+# Assuming today's date is '2023-11-13', replace it with the actual current date
+current_date = datetime.strptime('2023-11-13', '%Y-%m-%d')
+
+# Calculates the 'years' column based on the 'hiredate'
+active_employees['years'] = (current_date - active_employees['hiredate']).dt.days // 365
+
+# Removes quotes from 'raise_amount' and convert to numeric
+raises_file['raise_amount'] = raises_file['raise_amount'].str.strip("'").str.rstrip('%').astype('float') / 100.0
+
+def calculate_raise(years):
+    if years == 4:
+        years = 3
+    elif years == 6:
+        years = 5
+    elif 7 < years < 10:
+        years = 7
+    elif years > 10:
+        years = 10
+
+    # Gets the corresponding 'raise' for the given 'years'
+    raise_amount = raises_file.loc[raises_file['years'] == years, 'raise_amount'].values
+
+    # If the 'years' value is not found, return NaN
+    return raise_amount[0] if len(raise_amount) > 0 else np.nan
+
+# Apply the function to the 'years' column
+active_employees['raise'] = active_employees['years'].apply(calculate_raise)
+active_employees['Raise_Amount'] = active_employees['salary'] * active_employees['raise']
+active_employees['New_Salary'] = active_employees['salary'] + active_employees['Raise_Amount']
+
+print(active_employees)
+
+
 # 4 - Calculate the total salary for each dept
-# 5 - Chart the total salary for each dept in 1 bar chart
+
+# Groups by 'dept' and sum the salaries for each department
+dept_total_new_salary = active_employees.groupby('dept')['New_Salary'].sum().reset_index()
+
+# Converts total salary to millions
+dept_total_new_salary['New_Salary_in_millions'] = dept_total_new_salary['New_Salary'] / 1e6
+
+# # Plots a bar chart
+# plt.bar(dept_total_new_salary['dept'], dept_total_new_salary['New_Salary_in_millions'])
+# plt.xlabel('Department')
+# plt.ylabel('Total Salary (Millions)')
+# plt.title('Total Salary for Each Department')
+# plt.xticks(rotation=45, ha='right')  # Rotate x-axis labels for better visibility
+# plt.show()
+
 # 6 - Create a pie chart that shows the percentage that each dept has of the total money allocated for raises
+
+# Groups by 'dept' and sum the salaries for each department
+dept_total_raise_amount = active_employees.groupby('dept')['Raise_Amount'].sum().reset_index()
+# Print the result
+# print(dept_total_raise_amount)
+
+# Calculates the total raise amount across all departments
+total_raise_amount = dept_total_raise_amount['Raise_Amount'].sum()
+# print(total_raise_amount)
+
+# Calculate sthe percentage raise amount for each department
+dept_total_raise_amount['percentage'] = (dept_total_raise_amount['Raise_Amount'] / total_raise_amount) * 100
+
+# # Plots a pie chart
+# plt.pie(dept_total_raise_amount['percentage'], labels=dept_total_raise_amount['dept'], autopct='%1.1f%%', startangle=90)
+# plt.title('Percentage of Total Raises Allocated to Each Department')
+# plt.show()
+
+
 # 7 - Create a pie chart to show the percent of men vs women for the raise money allocated
+# Groups by 'gender' and sum the raise amounts for each gender
+gender_total_raise = active_employees.groupby('gender')['Raise_Amount'].sum().reset_index()
+
+# Calculates the total raise amount across all genders
+total_raise_amount_gender = gender_total_raise['Raise_Amount'].sum()
+
+# Calculates the percentage raise amount for each gender
+gender_total_raise['percentage'] = (gender_total_raise['Raise_Amount'] / total_raise_amount_gender) * 100
+
+# # Plots a pie chart
+# plt.pie(gender_total_raise['percentage'], labels=gender_total_raise['gender'], autopct='%1.1f%%', startangle=90)
+# plt.title('Percentage of Total Raises Allocated to Each Gender')
+# plt.show()
+
+
 # 8 - Create a pie chart to show the percent of men vs women for the raise money allocated by dept
+# Groups by 'dept' and 'gender' and sum the raise amounts for each department and gender
+dept_gender_total_raise = active_employees.groupby(['dept', 'gender'])['Raise_Amount'].sum().reset_index()
+
+# Calculate the total raise amount across all departments and genders
+total_raise_amount_dept_gender = dept_gender_total_raise['Raise_Amount'].sum()
+
+# Calculate the percentage raise amount for each department and gender
+dept_gender_total_raise['percentage'] = (dept_gender_total_raise['Raise_Amount'] / total_raise_amount_dept_gender) * 100
+
+# Pivot the table to have 'gender' as columns
+dept_gender_pivot = dept_gender_total_raise.pivot(index='dept', columns='gender', values='percentage')
+
+# Plot a pie chart for each department
+fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(15, 10))
+fig.suptitle('Percentage of Total Raises Allocated to Each Gender by Department')
+
+# Loop through each department and create a pie chart
+for i, (dept, data) in enumerate(dept_gender_pivot.iterrows()):
+    if i < len(axes.flat):
+        ax = axes.flat[i]
+        ax.pie(data, labels=data.index, autopct='%1.1f%%', startangle=90)
+        ax.set_title(dept)
+
+plt.show()
+
 # 9 - Create a dataframe for promotions.  If the persons salary excedes the salary max for their salary grade. create a column
+
 # called 'Promotion' and add the string 'PROMOTION DUE' otherwise leave blank
 
 
